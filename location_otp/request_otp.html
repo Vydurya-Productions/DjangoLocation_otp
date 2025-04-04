@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request OTP - Elegant Glass</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .glass-effect {
+            background: rgba(255, 251, 235, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 32px rgba(255, 215, 0, 0.1);
+        }
+        body {
+            background: #ffffff;
+            overflow-y: auto;
+        }
+        .input-focus {
+            transition: all 0.3s ease;
+        }
+        .input-focus:focus {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(234, 179, 8, 0.2);
+        }
+    </style>
+</head>
+<body class="min-h-screen font-['Poppins'] flex items-center justify-center p-4">
+    <div class="w-full max-w-md">
+        <div class="glass-effect rounded-3xl p-8 relative overflow-hidden">
+            <div class="absolute -top-16 -right-16 w-32 h-32 bg-yellow-300 rounded-full opacity-20"></div>
+            <div class="absolute -bottom-20 -left-20 w-40 h-40 bg-yellow-200 rounded-full opacity-20"></div>
+
+            <h1 class="text-3xl font-bold text-yellow-900 text-center mb-8 relative z-10">Request OTP</h1>
+            
+            <form id="requestOtpForm" class="space-y-7 relative z-10" method="post">
+                {% csrf_token %}
+                <!-- Phone Number Input -->
+                <div>
+                    <label for="phone" class="block text-sm font-medium text-yellow-800 mb-2">Phone Number</label>
+                    <input 
+                        type="tel" 
+                        id="phone" 
+                        name="phone" 
+                        maxlength="10"
+                        pattern="[0-9]{10}"
+                        class="w-full px-4 py-3 border border-yellow-200 rounded-xl input-focus bg-white/80 text-yellow-900 placeholder-yellow-400 shadow-md hover:shadow-lg"
+                        placeholder="Enter 10-digit phone number"
+                        required
+                    >
+                    <p class="text-red-500 text-xs mt-1 hidden" id="phoneError">Please enter a valid 10-digit phone number</p>
+                </div>
+
+                <!-- Get OTP Button -->
+                <button 
+                    type="submit"
+                    class="w-full bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                >
+                    Get OTP
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const phoneInput = document.getElementById('phone');
+        const form = document.getElementById('requestOtpForm');
+
+        phoneInput.addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+            if (this.value.length > 10) this.value = this.value.slice(0, 10);
+        });
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            document.getElementById('phoneError').classList.add('hidden');
+
+            const phone = phoneInput.value;
+            if (!/^\d{10}$/.test(phone)) {
+                document.getElementById('phoneError').classList.remove('hidden');
+                return;
+            }
+
+            // Here you would typically make an API call to send OTP
+            // For now, we'll simulate it by redirecting to otp.html with phone number
+            window.location.href = `otp.html?phone=${phone}`;
+        });
+    </script>
+</body>
+</html>

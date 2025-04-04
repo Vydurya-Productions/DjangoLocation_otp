@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location Finder - Elegant Glass</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .glass-effect {
+            background: rgba(255, 251, 235, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 32px rgba(255, 215, 0, 0.1);
+        }
+        body {
+            background: #ffffff;
+            overflow-y: auto;
+        }
+        .custom-select-wrapper {
+            position: relative;
+        }
+        .custom-select-wrapper::after {
+            content: '▼';
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #854d0e;
+            font-size: 12px;
+            pointer-events: none;
+            z-index: 10;
+        }
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            padding-right: 2.5rem; /* Space for the arrow */
+        }
+        .input-focus {
+            transition: all 0.3s ease;
+        }
+        .input-focus:focus {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(234, 179, 8, 0.2);
+        }
+    </style>
+</head>
+<body class="min-h-screen font-['Poppins'] flex items-center justify-center p-4">
+    <div class="w-full max-w-md">
+        <div class="glass-effect rounded-3xl p-8 relative overflow-hidden">
+            <!-- Decorative Element -->
+            <div class="absolute -top-16 -right-16 w-32 h-32 bg-yellow-300 rounded-full opacity-20"></div>
+            <div class="absolute -bottom-20 -left-20 w-40 h-40 bg-yellow-200 rounded-full opacity-20"></div>
+
+            <h1 class="text-3xl font-bold text-yellow-900 text-center mb-8 relative z-10">Find Your Place</h1>
+            
+            <form id="locationForm" class="space-y-7 relative z-10">
+                <!-- Pincode Input -->
+                <div>
+                    <label for="pincode" class="block text-sm font-medium text-yellow-800 mb-2">Pincode</label>
+                    <input 
+                        type="text" 
+                        id="pincode" 
+                        name="pincode" 
+                        maxlength="6"
+                        pattern="[0-9]{6}"
+                        class="w-full px-4 py-3 border border-yellow-200 rounded-xl input-focus bg-white/80 text-yellow-900 placeholder-yellow-400 shadow-md hover:shadow-lg"
+                        placeholder="Enter 6-digit pincode"
+                        required
+                    >
+                    <p class="text-red-500 text-xs mt-1 hidden" id="pincodeError">Please enter a valid 6-digit pincode</p>
+                </div>
+
+                <!-- State Select -->
+                <div class="custom-select-wrapper">
+                    <label for="state" class="block text-sm font-medium text-yellow-800 mb-2">State</label>
+                    <select 
+                        id="state" 
+                        name="state" 
+                        class="w-full px-4 py-3 border border-yellow-200 rounded-xl input-focus bg-white/80 text-yellow-900 shadow-md hover:shadow-lg cursor-pointer"
+                        required
+                    >
+                        <option value="">Select State</option>
+                        <option value="Andhra Pradesh">Andhra Pradesh</option>
+                        <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                        <option value="Assam">Assam</option>
+                        <option value="Bihar">Bihar</option>
+                        <option value="Chhattisgarh">Chhattisgarh</option>
+                        <option value="Goa">Goa</option>
+                        <option value="Gujarat">Gujarat</option>
+                        <option value="Haryana">Haryana</option>
+                        <option value="Himachal Pradesh">Himachal Pradesh</option>
+                        <option value="Jharkhand">Jharkhand</option>
+                        <option value="Karnataka">Karnataka</option>
+                        <option value="Kerala">Kerala</option>
+                        <option value="Madhya Pradesh">Madhya Pradesh</option>
+                        <option value="Maharashtra">Maharashtra</option>
+                        <option value="Manipur">Manipur</option>
+                        <option value="Meghalaya">Meghalaya</option>
+                        <option value="Mizoram">Mizoram</option>
+                        <option value="Nagaland">Nagaland</option>
+                        <option value="Odisha">Odisha</option>
+                        <option value="Punjab">Punjab</option>
+                        <option value="Rajasthan">Rajasthan</option>
+                        <option value="Sikkim">Sikkim</option>
+                        <option value="Tamil Nadu">Tamil Nadu</option>
+                        <option value="Telangana">Telangana</option>
+                        <option value="Tripura">Tripura</option>
+                        <option value="Uttar Pradesh">Uttar Pradesh</option>
+                        <option value="Uttarakhand">Uttarakhand</option>
+                        <option value="West Bengal">West Bengal</option>
+                        <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
+                        <option value="Chandigarh">Chandigarh</option>
+                        <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and Diu</option>
+                        <option value="Delhi">Delhi</option>
+                        <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+                        <option value="Ladakh">Ladakh</option>
+                        <option value="Lakshadweep">Lakshadweep</option>
+                        <option value="Puducherry">Puducherry</option>
+                    </select>
+                    <p class="text-red-500 text-xs mt-1 hidden" id="stateError">Please select a state</p>
+                </div>
+
+                <!-- City Input -->
+                <div>
+                    <label for="city" class="block text-sm font-medium text-yellow-800 mb-2">City/Town/District</label>
+                    <input 
+                        type="text" 
+                        id="city" 
+                        name="city" 
+                        class="w-full px-4 py-3 border border-yellow-200 rounded-xl input-focus bg-white/80 text-yellow-900 placeholder-yellow-400 shadow-md hover:shadow-lg"
+                        placeholder="Enter city/town/district"
+                        required
+                    >
+                    <p class="text-red-500 text-xs mt-1 hidden" id="cityError">Please enter a valid city name</p>
+                </div>
+
+                <!-- Submit Button -->
+                <button 
+                    type="submit"
+                    class="w-full bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                >
+                    Submit
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('locationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            document.querySelectorAll('.text-red-500').forEach(el => el.classList.add('hidden'));
+
+            const pincode = document.getElementById('pincode').value;
+            if (!/^\d{6}$/.test(pincode)) {
+                document.getElementById('pincodeError').classList.remove('hidden');
+                return;
+            }
+
+            const state = document.getElementById('state').value;
+            if (!state) {
+                document.getElementById('stateError').classList.remove('hidden');
+                return;
+            }
+
+            const city = document.getElementById('city').value.trim();
+            if (!city || city.length < 2) {
+                document.getElementById('cityError').classList.remove('hidden');
+                return;
+            }
+
+            console.log({ pincode, state, city });
+            alert('Form submitted successfully!');
+        });
+
+        document.getElementById('pincode').addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+            if (this.value.length > 6) this.value = this.value.slice(0, 6);
+        });
+    </script>
+</body>
+</html>

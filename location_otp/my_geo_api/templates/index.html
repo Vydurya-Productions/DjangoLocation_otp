@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location Finder - Elegant Glass</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .glass-effect {
+            background: rgba(255, 251, 235, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 32px rgba(255, 215, 0, 0.1);
+        }
+        body {
+            background: #ffffff;
+            overflow-y: auto;
+        }
+        .custom-select-wrapper {
+            position: relative;
+        }
+        .custom-select-wrapper::after {
+            content: '▼';
+            position: absolute;
+            right: 16px;
+            top: 65%;
+            transform: translateY(-50%);
+            color: #854d0e;
+            font-size: 12px;
+            pointer-events: none;
+            z-index: 10;
+        }
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            padding-right: 2.5rem;
+        }
+        .input-focus {
+            transition: all 0.3s ease;
+        }
+        .input-focus:focus {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(234, 179, 8, 0.2);
+        }
+        .popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .popup-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            max-width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            position: relative;
+            border: 2px solid #facc15;
+        }
+        .popup-close {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: #facc15;
+            color: white;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .popup-close:hover {
+            background: #eab308;
+        }
+    </style>
+</head>
+<body class="min-h-screen font-['Poppins'] flex items-center justify-center p-4">
+    <div class="w-full max-w-md">
+        <div class="glass-effect rounded-3xl p-8 relative overflow-hidden">
+            <div class="absolute -top-16 -right-16 w-32 h-32 bg-yellow-300 rounded-full opacity-20"></div>
+            <div class="absolute -bottom-20 -left-20 w-40 h-40 bg-yellow-200 rounded-full opacity-20"></div>
+
+            <h1 class="text-3xl font-bold text-yellow-900 text-center mb-8 relative z-10">Find Your Place</h1>
+            
+            <form id="locationForm" class="space-y-7 relative z-10" method="post">
+                {% csrf_token %}
+                <!-- Pincode Input -->
+                <div>
+                    <label for="pincode" class="block text-sm font-medium text-yellow-800 mb-2">Pincode</label>
+                    <input 
+                        type="text" 
+                        id="pincode" 
+                        name="pincode" 
+                        maxlength="6"
+                        pattern="[0-9]{6}"
+                        class="w-full px-4 py-3 border border-yellow-200 rounded-xl input-focus bg-white/80 text-yellow-900 placeholder-yellow-400 shadow-md hover:shadow-lg"
+                        placeholder="Enter 6-digit pincode"
+                        required
+                    >
+                    <p class="text-red-500 text-xs mt-1 hidden" id="pincodeError">Please enter a valid 6-digit pincode</p>
+                </div>
+
+                <!-- State Select (Disabled) -->
+                <div class="custom-select-wrapper">
+                    <label for="state" class="block text-sm font-medium text-yellow-800 mb-2">State</label>
+                    <select 
+                        id="state" 
+                        name="state" 
+                        class="w-full px-4 py-3 border border-yellow-200 rounded-xl bg-gray-100 text-yellow-900 shadow-md cursor-not-allowed"
+                        disabled
+                        required
+                    >
+                        <option value="">State will be auto-filled</option>
+                        <option value="Andhra Pradesh">Andhra Pradesh</option>
+                        <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                        <option value="Assam">Assam</option>
+                        <option value="Bihar">Bihar</option>
+                        <option value="Chhattisgarh">Chhattisgarh</option>
+                        <option value="Goa">Goa</option>
+                        <option value="Gujarat">Gujarat</option>
+                        <option value="Haryana">Haryana</option>
+                        <option value="Himachal Pradesh">Himachal Pradesh</option>
+                        <option value="Jharkhand">Jharkhand</option>
+                        <option value="Karnataka">Karnataka</option>
+                        <option value="Kerala">Kerala</option>
+                        <option value="Madhya Pradesh">Madhya Pradesh</option>
+                        <option value="Maharashtra">Maharashtra</option>
+                        <option value="Manipur">Manipur</option>
+                        <option value="Meghalaya">Meghalaya</option>
+                        <option value="Mizoram">Mizoram</option>
+                        <option value="Nagaland">Nagaland</option>
+                        <option value="Odisha">Odisha</option>
+                        <option value="Punjab">Punjab</option>
+                        <option value="Rajasthan">Rajasthan</option>
+                        <option value="Sikkim">Sikkim</option>
+                        <option value="Tamil Nadu">Tamil Nadu</option>
+                        <option value="Telangana">Telangana</option>
+                        <option value="Tripura">Tripura</option>
+                        <option value="Uttar Pradesh">Uttar Pradesh</option>
+                        <option value="Uttarakhand">Uttarakhand</option>
+                        <option value="West Bengal">West Bengal</option>
+                        <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
+                        <option value="Chandigarh">Chandigarh</option>
+                        <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and Diu</option>
+                        <option value="Delhi">Delhi</option>
+                        <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+                        <option value="Ladakh">Ladakh</option>
+                        <option value="Lakshadweep">Lakshadweep</option>
+                        <option value="Puducherry">Puducherry</option>
+                    </select>
+                    <p class="text-red-500 text-xs mt-1 hidden" id="stateError">State is required</p>
+                </div>
+
+                <!-- City Input (Disabled) -->
+                <div>
+                    <label for="city" class="block text-sm font-medium text-yellow-800 mb-2">City/Town/District</label>
+                    <input 
+                        type="text" 
+                        id="city" 
+                        name="city" 
+                        class="w-full px-4 py-3 border border-yellow-200 rounded-xl bg-gray-100 text-yellow-900 shadow-md cursor-not-allowed"
+                        placeholder="City will be auto-filled"
+                        disabled
+                        required
+                    >
+                    <p class="text-red-500 text-xs mt-1 hidden" id="cityError">City is required</p>
+                </div>
+
+                <!-- Area Select (Enabled) -->
+                <div class="custom-select-wrapper">
+                    <label for="area" class="block text-sm font-medium text-yellow-800 mb-2">Select Area</label>
+                    <select 
+                        id="area" 
+                        name="area" 
+                        class="w-full px-4 py-3 border border-yellow-200 rounded-xl input-focus bg-white/80 text-yellow-900 shadow-md hover:shadow-lg cursor-pointer"
+                        required
+                    >
+                        <option value="">Select an area</option>
+                    </select>
+                    <p class="text-red-500 text-xs mt-1 hidden" id="areaError">Please select an area</p>
+                </div>
+
+                <!-- Submit Button -->
+                <button 
+                    type="submit"
+                    class="w-full bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                >
+                    Submit
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Popup -->
+    <div id="responsePopup" class="popup">
+        <div class="popup-content glass-effect">
+            <span id="popupClose" class="popup-close">×</span>
+            <h2 class="text-xl font-semibold text-yellow-900 mb-4">API Response</h2>
+            <pre id="jsonResponse" class="text-sm text-yellow-800 bg-yellow-50 p-4 rounded-lg overflow-x-auto"></pre>
+        </div>
+    </div>
+
+    <script>
+        const pincodeInput = document.getElementById('pincode');
+        const stateSelect = document.getElementById('state');
+        const cityInput = document.getElementById('city');
+        const areaSelect = document.getElementById('area');
+        const form = document.getElementById('locationForm');
+        const popup = document.getElementById('responsePopup');
+        const jsonResponse = document.getElementById('jsonResponse');
+        const popupClose = document.getElementById('popupClose');
+
+        pincodeInput.addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+            if (this.value.length > 6) this.value = this.value.slice(0, 6);
+
+            if (this.value.length === 6) {
+                fetch(`https://api.postalpincode.in/pincode/${this.value}`, { method: 'GET' })
+                    .then(response => {
+                        if (!response.ok) throw new Error('Network response was not ok');
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data[0].Status === 'Success') {
+                            const postOffices = data[0].PostOffice;
+                            stateSelect.value = postOffices[0].State || '';
+                            cityInput.value = postOffices[0].District || '';
+
+                            // Clear existing options
+                            areaSelect.innerHTML = '<option value="">Select an area</option>';
+                            // Populate area options
+                            postOffices.forEach(office => {
+                                const option = document.createElement('option');
+                                option.value = office.Name;
+                                option.textContent = office.Name;
+                                areaSelect.appendChild(option);
+                            });
+                        } else {
+                            console.error('API Error:', data[0].Message);
+                            stateSelect.value = '';
+                            cityInput.value = '';
+                            areaSelect.innerHTML = '<option value="">Select an area</option>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Fetch Error:', error);
+                        stateSelect.value = '';
+                        cityInput.value = '';
+                        areaSelect.innerHTML = '<option value="">Select an area</option>';
+                    });
+            } else {
+                stateSelect.value = '';
+                cityInput.value = '';
+                areaSelect.innerHTML = '<option value="">Select an area</option>';
+            }
+        });
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            document.querySelectorAll('.text-red-500').forEach(el => el.classList.add('hidden'));
+
+            const pincode = pincodeInput.value;
+            if (!/^\d{6}$/.test(pincode)) {
+                document.getElementById('pincodeError').classList.remove('hidden');
+                return;
+            }
+
+            const state = stateSelect.value;
+            if (!state) {
+                document.getElementById('stateError').classList.remove('hidden');
+                return;
+            }
+
+            const city = cityInput.value.trim();
+            if (!city) {
+                document.getElementById('cityError').classList.remove('hidden');
+                return;
+            }
+
+            const area = areaSelect.value;
+            if (!area) {
+                document.getElementById('areaError').classList.remove('hidden');
+                return;
+            }
+
+            // Fetch full API response for popup
+            fetch(`https://api.postalpincode.in/pincode/${pincode}`, { method: 'GET' })
+                .then(response => {
+                    if (!response.ok) throw new Error('API request failed');
+                    return response.json();
+                })
+                .then(apiData => {
+                    jsonResponse.textContent = JSON.stringify(apiData, null, 2);
+                    popup.style.display = 'flex';
+                })
+                .catch(error => {
+                    jsonResponse.textContent = JSON.stringify({ error: error.message }, null, 2);
+                    popup.style.display = 'flex';
+                });
+        });
+
+        popupClose.addEventListener('click', function() {
+            popup.style.display = 'none';
+        });
+
+        popup.addEventListener('click', function(e) {
+            if (e.target === popup) {
+                popup.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

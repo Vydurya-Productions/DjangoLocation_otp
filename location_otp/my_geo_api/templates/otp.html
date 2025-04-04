@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify OTP - Elegant Glass</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .glass-effect { background: rgba(255, 251, 235, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.4); box-shadow: 0 8px 32px rgba(255, 215, 0, 0.1); }
+        body { background: #ffffff; overflow-y: auto; }
+        .otp-input { width: 2.5rem; height: 2.5rem; text-align: center; transition: all 0.3s ease; }
+        .otp-input:focus { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(234, 179, 8, 0.2); }
+    </style>
+</head>
+<body class="min-h-screen font-['Poppins'] flex items-center justify-center p-4">
+    <div class="w-full max-w-md">
+        <div class="glass-effect rounded-3xl p-8 relative overflow-hidden">
+            <div class="absolute -top-16 -right-16 w-32 h-32 bg-yellow-300 rounded-full opacity-20"></div>
+            <div class="absolute -bottom-20 -left-20 w-40 h-40 bg-yellow-200 rounded-full opacity-20"></div>
+
+            <h1 class="text-3xl font-bold text-yellow-900 text-center mb-2 relative z-10">Enter OTP</h1>
+            <p class="text-sm text-yellow-800 text-center mb-6 relative z-10">
+                The OTP is sent to <span id="phoneNumber" class="font-medium">{{ phone }}</span>
+            </p>
+            
+            <form id="otpForm" class="space-y-7 relative z-10" method="post">
+                {% csrf_token %}
+                <div class="flex justify-center gap-2 md:gap-4">
+                    {% for i in "012345"|make_list %}
+                        <input type="tel" name="otp_{{ i }}" maxlength="1" pattern="[0-9]" class="otp-input border border-yellow-200 rounded-lg bg-white/80 text-yellow-900 shadow-md" required>
+                    {% endfor %}
+                </div>
+
+                {% if error %}
+                    <p class="text-red-500 text-xs text-center">{{ error }}</p>
+                {% endif %}
+
+                <div class="text-center">
+                    <p class="text-sm text-yellow-800 mb-2">
+                        Time remaining: <span id="countdown" class="font-medium">00:30</span>
+                    </p>
+                    <button 
+                        type="button" 
+                        id="resendBtn" 
+                        class="text-yellow-600 hover:text-yellow-700 font-medium text-sm cursor-pointer hidden"
+                        onclick="resendOTP('{{ phone }}')"
+                    >
+                        Resend OTP
+                    </button>
+                </div>
+
+                <button 
+                    type="submit"
+                    class="w-full bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                >
+                    Verify OTP
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const otpInputs = document.querySelectorAll('.otp-input');
+        otpInputs.forEach((input, index) => {
+            input.addEventListener('input', (e) => {
+                e.target.value = e.target.value.replace(/[^0-9]/g, '');
+                if (e.target.value.length === 1 && index < 5) {
+                    otpInputs[index + 1].focus();
+                }
+            });
+            
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !input.value && index > 0) {
+                    otpInputs[index - 1].focus();
+                }
+            });
+        });
+
+        let timeLeft = 30;
+        const countdownElement = document.getElementById('countdown');
+        const resendBtn = document.getElementById('resendBtn');
+
+        const timer = setInterval(() => {
+            timeLeft--;
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            countdownElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                countdownElement.parentElement.classList.add('hidden');
+                resendBtn.classList.remove('hidden');
+            }
+        }, 1000);
+
+        function resendOTP(phone) {
+            fetch('/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: `phone=${phone}`
+            })
+            .then(response => {
+                if (response.ok) {
+                    timeLeft = 30;
+                    countdownElement.parentElement.classList.remove('hidden');
+                    resendBtn.classList.add('hidden');
+                    const newTimer = setInterval(() => {
+                        timeLeft--;
+                        const minutes = Math.floor(timeLeft / 60);
+                        const seconds = timeLeft % 60;
+                        countdownElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                        if (timeLeft <= 0) {
+                            clearInterval(newTimer);
+                            countdownElement.parentElement.classList.add('hidden');
+                            resendBtn.classList.remove('hidden');
+                        }
+                    }, 1000);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
